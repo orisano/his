@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        "use strict";
+
+        var socket = io.connect("http://localhost:8080");
+        var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        var recognition = new SpeechRecognition();
+
+        recognition.lang = "ja";
+        recognition.addEventListener("result", function (eve) {
+            var text = eve.results.item(0).item(0).transcript;
+            console.log("[INFO] recognize task end.", text);
+            socket.emit("result", text);
+        }, false);
+
+        socket.on("recognize", function(data) {
+            console.log("[INFO] recognize task start.")
+            recognition.start();
+        });
+    </script>
+</head>
+<body>
+</body>
+</html>

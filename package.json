@@ -1,0 +1,20 @@
+{
+  "name": "his",
+  "version": "1.0.0",
+  "description": "Human Interface System class's product",
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.13.4",
+    "socketio": "^1.0.0"
+  },
+  "scripts": {
+    "run": "node app.js"
+  },
+  "keywords": [
+    "web",
+    "speech",
+    "api"
+  ],
+  "author": "orisano",
+  "license": "MIT"
+}
