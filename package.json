@@ -8,7 +8,7 @@
     "socketio": "^1.0.0"
   },
   "scripts": {
-    "run": "node app.js"
+    "server": "node app.js"
   },
   "keywords": [
     "web",
