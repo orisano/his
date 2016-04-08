@@ -6,7 +6,9 @@
     <script>
         "use strict";
 
-        var socket = io.connect("http://localhost:8080");
+        var HOST = "http://" + window.location.host;
+        var socket = io.connect(HOST);
+        var subscriber = io.connect(HOST + "/subscribe");
         var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         var recognition = new SpeechRecognition();
 
@@ -21,6 +23,10 @@
             console.log("[INFO] recognize task start.")
             recognition.start();
         });
+
+        subscriber.on("data", function(data){
+            console.log("[SUBSCRIBER]:", data);
+        })
     </script>
 </head>
 <body>
