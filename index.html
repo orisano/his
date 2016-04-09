@@ -2,33 +2,95 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <style>
+        html {
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            position: relative;
+        }
+
+        #content-wrapper {
+            position: absolute;
+            text-align: center;
+            top: 50%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-50%);
+        }
+
+        #statusIcon {
+            font-size: 22em;
+        }
+
+        .blinking {animation:blink 1.5s ease-in-out infinite alternate;}
+        @keyframes blink {
+            0% {opacity:0;}
+            100% {opacity:1;}
+        }
+    </style>
+
     <script src="/socket.io/socket.io.js"></script>
     <script>
         "use strict";
 
         var HOST = "http://" + window.location.host;
         var socket = io.connect(HOST);
-        var subscriber = io.connect(HOST + "/subscribe");
         var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         var recognition = new SpeechRecognition();
+        var recording = false;
 
         recognition.lang = "ja";
-        recognition.addEventListener("result", function (eve) {
-            var text = eve.results.item(0).item(0).transcript;
-            console.log("[INFO] recognize task end.", text);
-            socket.emit("result", text);
+        recognition.interimResults = true;
+        recognition.continuous = true;
+
+        document.addEventListener("DOMContentLoaded", function() {
+            var $status_icon = document.getElementById("statusIcon");
+            var $recognized_text = document.getElementById("recognizedText");
+
+            recognition.addEventListener("start", function() {
+                console.log("[INFO] recording start");
+                recording = true;
+            }, false);
+
+            recognition.addEventListener("end", function() {
+                console.log("[INFO] recording end");
+                recording = false;
+            }, false);
+
+            recognition.addEventListener("result", function(eve) {
+                var results = eve.results;
+                var candidate = results[eve.resultIndex];
+                var text = candidate[0].transcript;
+                if (candidate.isFinal) {
+                    console.log("[INFO] text send =", text);
+                    socket.emit("result", text);
+                }
+                $recognized_text.textContent = text;
+            }, false);
+
+            $status_icon.addEventListener("click", function(eve) {
+                if (recording) {
+                    recognition.stop();
+                    eve.target.classList.remove("blinking");
+                }
+                else {
+                    recognition.start();
+                    eve.target.classList.add("blinking")
+                }
+            }, false);
         }, false);
-
-        socket.on("recognize", function(data) {
-            console.log("[INFO] recognize task start.")
-            recognition.start();
-        });
-
-        subscriber.on("data", function(data){
-            console.log("[SUBSCRIBER]:", data);
-        })
     </script>
 </head>
 <body>
+    <div id="content-wrapper">
+        <i id="statusIcon" class="fa fa-microphone"></i>
+        <p id="recognizedText"></p>
+    </div>
 </body>
 </html>

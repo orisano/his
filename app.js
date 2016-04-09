@@ -24,15 +24,21 @@ app.get("/latest", (req, res) => {
     res.send(logs[logs.length - 1]);
 });
 
+app.get("/join", (req, res) => {
+    res.send(logs.join(" "));
+});
+
 io.on("connection", (socket) => {
     status = Status.OPEN;
+
     console.log("[INFO] connection established.");
+    console.log("[INFO] recognize task start.");
+
     socket.on("result", (data) => {
         status = Status.OPEN;
         console.log(data);
         logs.push(data);
         sub.emit("data", data);
-
     });
     socket.on("disconnect", () => {
         status = Status.CLOSE;
@@ -57,8 +63,4 @@ function record() {
         return;
     }
     status = Status.RUNNING;
-    console.log("[INFO] recognize task start.")
-    io.emit("recognize", "start");
 }
-
-setInterval(record, 10000);
