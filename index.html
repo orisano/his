@@ -70,8 +70,14 @@
                 if (candidate.isFinal) {
                     console.log("[INFO] text send =", text);
                     socket.emit("result", text);
+                    $recognized_text.textContent = '"' + text + '" Send!';
+                    setTimeout(function() {
+                        $recognized_text.textContent = "";
+                    }, 1000);
                 }
-                $recognized_text.textContent = text;
+                else {
+                    $recognized_text.textContent = text;
+                }
             }, false);
 
             $status_icon.addEventListener("click", function(eve) {
