@@ -12,7 +12,7 @@ const Status = Object.freeze({
 });
 
 let status = Status.CLOSE;
-const logs = [""];
+let logs = [""];
 
 server.listen(8080);
 
@@ -26,6 +26,19 @@ app.get("/latest", (req, res) => {
 
 app.get("/join", (req, res) => {
     res.send(logs.join(" "));
+});
+
+app.get("/clear", (req, res) => {
+    logs = [""];
+    res.send("OK");
+});
+
+app.get("/speak", (req, res) => {
+    const text = req.query.text;
+    const lang = req.query.lang || "ja-JP";
+
+    io.emit("speak", {text, lang});
+    res.send("OK");
 });
 
 io.on("connection", (socket) => {
@@ -52,15 +65,3 @@ sub.on("connection", (socket) => {
         console.log("[INFO] subscriber disconnected.");
     })
 });
-
-function record() {
-    if (status === Status.CLOSE) {
-        console.log("[ERROR] index.html does not opened.");
-        return;
-    }
-    if (status === Status.RUNNING) {
-        console.log("[ERROR] recognize task does not finished.");
-        return;
-    }
-    status = Status.RUNNING;
-}

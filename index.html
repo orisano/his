@@ -49,17 +49,27 @@
         recognition.interimResults = true;
         recognition.continuous = true;
 
+        socket.on("speak", function(data){
+            var synthes = new SpeechSynthesisUtterance();
+            synthes.voiceURI = "native";
+            synthes.text = data.text;
+            synthes.lang = data.lang;
+            speechSynthesis.speak(synthes);
+        });
+
         document.addEventListener("DOMContentLoaded", function() {
             var $status_icon = document.getElementById("statusIcon");
             var $recognized_text = document.getElementById("recognizedText");
 
             recognition.addEventListener("start", function() {
                 console.log("[INFO] recording start");
+                $status_icon.classList.add("blinking")
                 recording = true;
             }, false);
 
             recognition.addEventListener("end", function() {
                 console.log("[INFO] recording end");
+                $status_icon.classList.remove("blinking")
                 recording = false;
             }, false);
 
@@ -71,6 +81,10 @@
                     console.log("[INFO] text send =", text);
                     socket.emit("result", text);
                     $recognized_text.textContent = '"' + text + '" Send!';
+                    recognition.stop();
+                    setTimeout(function() {
+                        recognition.start();
+                    }, 1000);
                     setTimeout(function() {
                         $recognized_text.textContent = "";
                     }, 1000);
@@ -83,11 +97,9 @@
             $status_icon.addEventListener("click", function(eve) {
                 if (recording) {
                     recognition.stop();
-                    eve.target.classList.remove("blinking");
                 }
                 else {
                     recognition.start();
-                    eve.target.classList.add("blinking")
                 }
             }, false);
         }, false);
