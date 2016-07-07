@@ -80,6 +80,9 @@ io.on("connection", (socket) => {
         status = Status.CLOSE;
         console.log("[INFO] disconnected.");
     });
+    socket.on("current", (data) => {
+        current = data.text;
+    })
 });
 
 sub.on("connection", (socket) => {
