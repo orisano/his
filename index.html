@@ -39,6 +39,8 @@
     <script>
         "use strict";
 
+        speechSynthesis.getVoices()
+
         var HOST = "http://" + window.location.host;
         var socket = io.connect(HOST);
         var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -50,10 +52,11 @@
         recognition.continuous = true;
 
         socket.on("speak", function(data){
+            speechSynthesis.cancel();
             var synthes = new SpeechSynthesisUtterance();
-            synthes.voiceURI = "native";
+            var voice = speechSynthesis.getVoices().filter(function(x){ return x.lang == data.lang; })[0];
             synthes.text = data.text;
-            synthes.lang = data.lang;
+            synthes.voice = voice;
             speechSynthesis.speak(synthes);
         });
 
@@ -84,10 +87,10 @@
                     recognition.stop();
                     setTimeout(function() {
                         recognition.start();
-                    }, 1000);
+                    }, 300);
                     setTimeout(function() {
                         $recognized_text.textContent = "";
-                    }, 1000);
+                    }, 300);
                 }
                 else {
                     $recognized_text.textContent = text;

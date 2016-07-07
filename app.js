@@ -13,8 +13,10 @@ const Status = Object.freeze({
 
 let status = Status.CLOSE;
 let logs = [""];
+let current = "";
 
-server.listen(8080);
+const PORT = 8080;
+server.listen(PORT, () => console.log(`Listen localhost:${PORT}`));
 
 app.get("/", (req, res) => {
     res.sendFile(__dirname + "/index.html");
@@ -33,12 +35,33 @@ app.get("/clear", (req, res) => {
     res.send("OK");
 });
 
+function detection_locale(text) {
+    const c = text.charCodeAt(0);
+    if (c < 255) return "en-US";
+    if (c > 10000) return "ja-JP";
+    return "th-TH";
+}
+
 app.get("/speak", (req, res) => {
     const text = req.query.text;
-    const lang = req.query.lang || "ja-JP";
+    const lang = req.query.lang || detection_locale(text);
 
     io.emit("speak", {text, lang});
     res.send("OK");
+});
+
+app.get("/play", (req, res) => {
+    io.emit("play", {});
+    res.send("OK");
+});
+
+app.get("/pause", (req, res) => {
+    io.emit("pause", {});
+    res.send("OK");
+});
+
+app.get("/current", (req, res) => {
+    res.send(current);
 });
 
 io.on("connection", (socket) => {
@@ -56,12 +79,12 @@ io.on("connection", (socket) => {
     socket.on("disconnect", () => {
         status = Status.CLOSE;
         console.log("[INFO] disconnected.");
-    })
+    });
 });
 
 sub.on("connection", (socket) => {
     console.log("[INFO] subscriber registered.");
     socket.on("disconnect", () => {
         console.log("[INFO] subscriber disconnected.");
-    })
+    });
 });
