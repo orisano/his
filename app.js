@@ -1,7 +1,12 @@
 "use strict";
 
+const fs = require("fs");
 const app = require("express")();
-const server = require("http").Server(app);
+const options = {
+    key: fs.readFileSync("./certs/server.key"),
+    cert: fs.readFileSync("./certs/server.crt")
+};
+const server = require("https").createServer(options, app);
 const io = require("socket.io")(server);
 const sub = io.of("/subscribe");
 

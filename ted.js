@@ -6,12 +6,12 @@
 // @description  try to take over the world!
 // @author       You
 // @grant        none
-// @require http://localhost:8080/socket.io/socket.io.js
+// @require https://localhost:8080/socket.io/socket.io.js
 // ==/UserScript==
 
 (function() {
     'use strict';
-    var socket = io.connect("http://localhost:8080/");
+    var socket = io.connect("https://localhost:8080/");
     socket.on("play", function(){
         $("#player-hero-play").click();
     });

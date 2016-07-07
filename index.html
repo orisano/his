@@ -41,7 +41,7 @@
 
         speechSynthesis.getVoices()
 
-        var HOST = "http://" + window.location.host;
+        var HOST = "https://" + window.location.host;
         var socket = io.connect(HOST);
         var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         var recognition = new SpeechRecognition();
